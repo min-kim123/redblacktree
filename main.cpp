@@ -21,8 +21,9 @@ class Node {
 };
 
 void insert(Node* &newnode, Node* &head);
-//void insert-fix(Node* &newnode, Node* &head)
 void print(Node* head, int numTabs);
+void left_rotate(Node* &head, Node* &k);
+void right_rotate(Node* &head, Node* &k);
 
 int main() {
     cout << 1/5;
@@ -41,11 +42,12 @@ int main() {
                 cout << "Enter number, enter -1 to quit adding: ";
                  cin >> num;
                 if (num == -1) {
+                    num = 0;
                     break;
                 }
-            Node* newnode = new Node(num);
-            insert(newnode, head);
-        }
+                Node* newnode = new Node(num);
+                insert(newnode, head);
+            }
         }
         else if (strcmp(input, "read") == 0) {
             char file[80];
@@ -58,7 +60,7 @@ int main() {
             cout << "Numbers from file: ";
             while (numFile >> rawinputs[total]) {
                 Node* newnode = new Node(rawinputs[total]);
-                //insert(newnode, head);
+                insert(newnode, head);
                 cout << rawinputs[total] << " ";
                 total+=1;
             }
@@ -74,15 +76,16 @@ int main() {
 
 }
 
-void insert(Node* &newnode, Node* &head) {
+void insert(Node* &k, Node* &head) {
+    //inserting normally into the tree with no rotations
     if (head == NULL) {//if there is nothing in the tree
-        head = newnode;
+        head = k;
         head->type = 2;
     }
     else {
         Node* n = head;
         while((n->left != NULL) || (n->right != NULL)) {
-            if (newnode->data > n->data) {
+            if (k->data > n->data) {
                 n = n->right;
             }
             else {
@@ -91,22 +94,117 @@ void insert(Node* &newnode, Node* &head) {
             cout << n->data << endl;
         }
         cout << n->data << endl;
-        newnode->parent = n;
-        if (n->data > newnode->data) {
-            n->left = newnode;
+        k->parent = n;
+        if (n->data > k->data) {
+            n->left = k;
         }
         else {
-            n->right = newnode;
+            n->right = k;
         }
-        newnode->type = 1;
-        //insert_fix();
+        k->type = 1;
     }
-    int numTabs = 0;
-    print(head, numTabs);
+    cout << "a" << endl;
+    //restoring through rotations/recolors
+    while ((k != head) && (k->parent->type == 1)) {//if parent of k is red; don't need to change anything if it's black
+        cout << "b" << endl;
+        if (k->parent == k->parent->parent->left) {//if k's parent is a left node
+            cout << "c" << endl;
+            Node* newnodeRightUncle =  k->parent->parent->right;
+            if (newnodeRightUncle != NULL) {
+                if (newnodeRightUncle->type == 1) {//if right uncle is red
+                k->parent->type = 2;
+                newnodeRightUncle->type = 2;
+                k->parent->parent->type = 1;
+                k = k->parent->parent;//k becomes the grandparent that has just become red
+                }
+            }
+            else {//if right uncle is black
+                if (k == k->parent->right) {//if k is right, double rotation
+                    k = k->parent;
+                    //LEFT ROTATE
+                    left_rotate(head, k);
+                }
+                //else single rotation
+                k->parent->type = 2;
+                k->parent->parent->type = 1;
+                k = k->parent->parent;
+                //right rotate
+                right_rotate(head, k);
+            }
+        }
+        else {//if k's parent is a right node:  copy of the if except reversed
+            cout << "d" << endl;
+            Node* newnodeLeftUncle =  k->parent->parent->left;
+            cout << "e" << endl;
+            if (newnodeLeftUncle != NULL) {
+                if (newnodeLeftUncle->type == 1) {//if right uncle is red
+                cout << "f" << endl;
+                k->parent->type = 2;
+                newnodeLeftUncle->type = 2;
+                k->parent->parent->type = 1;
+                k = k->parent->parent;//k becomes the grandparent that has just become red
+                }
+            }
+            else {//if right uncle is black or null
+                if (k == k->parent->left) {//if k is right, double rotation
+                    k = k->parent;
+                    //LEFT ROTATE
+                    right_rotate(head, k);
+                }
+                //else single rotation
+                k->parent->type = 2;
+                k->parent->parent->type = 1;
+                k = k->parent->parent;
+                //right rotate
+                left_rotate(head, k);
+            }
+        }
+    }
+    head->type = 2;
 }
 
-void insert_fix() {
+void left_rotate(Node* &head, Node* &k) {
+    Node* y = k->right;//y is the newly inserted node
+    k->right = y->left;
+    if (y->left != NULL) {
+        y->left->parent = k;
+    }
+    y->parent = k->parent;
+    if (k->parent == NULL) {
+        head = y;
+    }
+    else {
+        if (k == k->parent->left) {
+            k->parent->left = y;
+        }
+        else {
+            k->parent->right = y;
+        }
+    }
+    y->left = k;
+    k->parent = y;
+}
 
+void right_rotate(Node* &head, Node* &k) {
+    Node* y = k->left;//y is the newly inserted node
+    k->left = y->right;
+    if (y->right != NULL) {
+        y->right->parent = k;
+    }
+    y->parent = k->parent;
+    if (k->parent == NULL) {
+        head = y;
+    }
+    else {
+        if (k == k->parent->right) {
+            k->parent->right = y;
+        }
+        else {
+            k->parent->left = y;
+        }
+    }
+    y->right = k;
+    k->parent = y;
 }
 
 void print(Node* n, int numTabs) {
@@ -118,6 +216,11 @@ void print(Node* n, int numTabs) {
   for (int i = 0; i < numTabs; ++i) {
     cout << "\t";
   }
-  cout << n->data << endl;
+  if (n->type == 1) {
+    cout << n->data << endl;
+  }
+  else {
+    cout << "(" << n->data << ")" << endl;
+  }
   print(n->left, numTabs);
 }
