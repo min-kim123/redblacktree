@@ -29,6 +29,7 @@ void insert(Node* &newnode, Node* &head);
 void print(Node* head, int numTabs);
 void left_rotate(Node* &head, Node* &k);
 void right_rotate(Node* &head, Node* &k);
+void deleet(int num, Node* &head);
 
 int main() {
     cout << 1/5;
@@ -71,6 +72,11 @@ int main() {
         else if (strcmp(input, "print") == 0) {
             int numTabs = 0;
             print(head, numTabs);
+        }
+        else if (strcmp(input, "delete")==0) {
+            cout << "Number to delete: ";
+            cin >> num;
+            deleet(num, head);
         }
         else if (strcmp(input, "quit") == 0) {
             cont = false;
@@ -227,4 +233,26 @@ void print(Node* n, int numTabs) {
     cout << "(" << n->data << ")" << endl;
   }
   print(n->left, numTabs);
+}
+
+void deleet(int num, Node* &head) {//regular BST deletion
+    Node* n = head;
+    Node* node_delete = NULL;
+    while (n != NULL) {
+        if (n->data == num) {
+            node_delete = n;
+            break;
+        }
+        else if (n->data > num) {
+            n = n->right;
+        }
+        else if (n->data < num) {
+            n = n->right;
+        }
+    }
+    if (node_delete == NULL) {
+        cout << "Number does not exist" << endl;
+        return;
+    }
+    
 }
