@@ -30,6 +30,7 @@ void print(Node* head, int numTabs);
 void left_rotate(Node* &head, Node* &k);
 void right_rotate(Node* &head, Node* &k);
 void deleet(int num, Node* &head);
+void search (Node* n, int searchnum);
 
 int main() {
     cout << 1/5;
@@ -40,7 +41,7 @@ int main() {
     int num = 0;
     Node* head = NULL;
     while (cont == true) {
-        cout << "Add, read, print, or quit (add/read/print/quit)?: ";
+        cout << "Add, read, print, or quit (add/read/delete/search/print/quit)?: ";
         cin >> input;
         cin.ignore();
         if (strcmp(input, "add") == 0) {
@@ -74,9 +75,17 @@ int main() {
             print(head, numTabs);
         }
         else if (strcmp(input, "delete")==0) {
+            int num = 0;
             cout << "Number to delete: ";
             cin >> num;
             deleet(num, head);
+        }
+        else if (strcmp(input, "search") == 0) {
+            int searchnum = 0;
+            cout << "Number: ";
+            cin >> searchnum;
+            search(head, searchnum);
+
         }
         else if (strcmp(input, "quit") == 0) {
             cont = false;
@@ -254,5 +263,68 @@ void deleet(int num, Node* &head) {//regular BST deletion
         cout << "Number does not exist" << endl;
         return;
     }
-    
+    Node* y = node_delete;
+    Node* node_replacer;
+    int color = node_delete->color;
+    //TRANSPLANT
+    if (node_delete->left == NULL) {//if node only has right branch
+        node_replacer = node_delete->right;
+        //for all of these cases replace whatever node with the deleted node's right child
+        if (node_delete->parent == NULL) {//if node_delete is head
+            head = node_replacer;
+        }
+        else if (node_delete== node_delete->parent->left) {//if node being deleted is a left node
+            node_delete->parent->left = node_replacer;
+        }
+        else {
+            node_delete->parent->right = node_replacer;
+        }
+        node_delete->right->parent = node_replacer;
+    }
+    else if (node_delete->right == NULL) {//if node only has left branch
+        node_replacer = node_delete->left;
+        if (node_delete->parent == NULL) {//if node_delete is head
+            head = node_replacer;
+        }
+        else if (node_delete== node_delete->parent->left) {//if node being deleted is a left node
+            node_delete->parent->left = node_replacer;
+        }
+        else {
+            node_delete->parent->right = node_replacer;
+        }
+        node_delete->right->parent = node_replacer;
+    }
+    else {//if node_delete has 2 children
+        y = node_delete->right
+        while(y->left != NULL) {
+            y = y->left;
+        }
+        color = y->color;
+        node_replace = y->right;
+        if (y->parent = node_delete) {
+            node_replace->parent = y;
+        }
+    }
+    delete node_delete;
+    if (color == 1) {//if deleted node's color was black
+
+    }
+
+}
+
+void search (Node* n, int searchnum) {
+  if (n->data == searchnum) {
+    cout << "Number exists." << endl;
+    return;
+  }
+  else if (n->data > searchnum && n->left != NULL) {
+    search(n->left, searchnum);
+  }
+  else if (n->data < searchnum && n->right != NULL) {
+    search(n->right, searchnum);
+  }
+  else if (n->left == NULL || n->right == NULL) {//number doesn't exist
+    cout << "Number doesn't exist." << endl;
+    return;
+  }
 }
