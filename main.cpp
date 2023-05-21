@@ -244,6 +244,22 @@ void print(Node* n, int numTabs) {
   print(n->left, numTabs);
 }
 
+void replace(Node* &head, Node* &u, Node* &v) {
+    if (u->parent == NULL) {
+			head = v;
+    } 
+    else if (u == u->parent->left){
+        u->parent->left = v;
+    } 
+    else {
+        u->parent->right = v;
+    }
+    if (v != NULL) {
+        v->parent = u->parent;
+    }
+		
+}
+
 void deleet(int num, Node* &head) {
     Node* n = head;
     Node* node_delete = NULL;
@@ -253,7 +269,7 @@ void deleet(int num, Node* &head) {
             break;
         }
         else if (n->data > num) {
-            n = n->right;
+            n = n->left;
         }
         else if (n->data < num) {
             n = n->right;
@@ -263,67 +279,53 @@ void deleet(int num, Node* &head) {
         cout << "Number does not exist" << endl;
         return;
     }
+    cout << "Numebr exists" << endl;
     Node* y = node_delete;
     Node* node_replacer;
     int color = node_delete->type;
     if (node_delete->left == NULL) {//if node only has right branch
+        cout << "node->left == null" << endl;
         node_replacer = node_delete->right;
         //for all of these cases replace whatever node with the deleted node's right child
         //TRANSPLANT
-        if (node_delete->parent == NULL) {//if node_delete is head
-            head = node_replacer;
-        }
-        else if (node_delete== node_delete->parent->left) {//if node being deleted is a left node
-            node_delete->parent->left = node_replacer;
-        }
-        else {
-            node_delete->parent->right = node_replacer;
-        }
-        node_delete->right->parent = node_replacer;
+        replace(head, node_delete, node_replacer);
     }
     else if (node_delete->right == NULL) {//if node only has left branch
+        cout << "node->right == null" << endl;   
         node_replacer = node_delete->left;
         //TRANSPLANT
-        if (node_delete->parent == NULL) {//if node_delete is head
-            head = node_replacer;
-        }
-        else if (node_delete== node_delete->parent->left) {//if node being deleted is a left node
-            node_delete->parent->left = node_replacer;
-        }
-        else {
-            node_delete->parent->right = node_replacer;
-        }
-        node_delete->right->parent = node_replacer;
+        replace(head, node_delete, node_replacer);
     }
     else {//if node_delete has 2 children
+        cout << "node has 2 children" << endl;
         y = node_delete->right;
         while(y->left != NULL) {
             y = y->left;
         }
+        cout << "y data: " << y->data << endl;
         color = y->type;
         node_replacer = y->right;
         if (y->parent == node_delete) {
-            node_replacer->parent = y;
+            cout << "if" << endl;
         }
         else {
+            cout << "else" << endl;
             //TRANSPLANT
-            if (y->parent == NULL) {//if node_delete is head
-                head = y->right;
-            }
-            else if (y== y->parent->left) {//if node being deleted is a left node
-                y->parent->left = y->right;
-            }
-            else {
-                y->parent->right = y->right;
-            }
-            y->right->parent = y->parent;
+            replace(head, y, y->right);
+            y->right = node_delete->right;
+            y->right->parent = y;
 
         }
+        cout << "out" << endl;
+        //TRANSPLANT
+        replace(head, node_delete, y);
         y->left = node_delete->left;
         y->left->parent = y;
         y->type = node_delete->type;
     }
+    cout << "end" << endl;
    delete node_delete;
+   cout << "deleted" << endl;
 
 }
 
