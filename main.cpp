@@ -244,7 +244,7 @@ void print(Node* n, int numTabs) {
   print(n->left, numTabs);
 }
 
-void deleet(int num, Node* &head) {//regular BST deletion
+void deleet(int num, Node* &head) {
     Node* n = head;
     Node* node_delete = NULL;
     while (n != NULL) {
@@ -265,11 +265,11 @@ void deleet(int num, Node* &head) {//regular BST deletion
     }
     Node* y = node_delete;
     Node* node_replacer;
-    int color = node_delete->color;
-    //TRANSPLANT
+    int color = node_delete->type;
     if (node_delete->left == NULL) {//if node only has right branch
         node_replacer = node_delete->right;
         //for all of these cases replace whatever node with the deleted node's right child
+        //TRANSPLANT
         if (node_delete->parent == NULL) {//if node_delete is head
             head = node_replacer;
         }
@@ -283,6 +283,7 @@ void deleet(int num, Node* &head) {//regular BST deletion
     }
     else if (node_delete->right == NULL) {//if node only has left branch
         node_replacer = node_delete->left;
+        //TRANSPLANT
         if (node_delete->parent == NULL) {//if node_delete is head
             head = node_replacer;
         }
@@ -295,20 +296,34 @@ void deleet(int num, Node* &head) {//regular BST deletion
         node_delete->right->parent = node_replacer;
     }
     else {//if node_delete has 2 children
-        y = node_delete->right
+        y = node_delete->right;
         while(y->left != NULL) {
             y = y->left;
         }
-        color = y->color;
-        node_replace = y->right;
-        if (y->parent = node_delete) {
-            node_replace->parent = y;
+        color = y->type;
+        node_replacer = y->right;
+        if (y->parent == node_delete) {
+            node_replacer->parent = y;
         }
-    }
-    delete node_delete;
-    if (color == 1) {//if deleted node's color was black
+        else {
+            //TRANSPLANT
+            if (y->parent == NULL) {//if node_delete is head
+                head = y->right;
+            }
+            else if (y== y->parent->left) {//if node being deleted is a left node
+                y->parent->left = y->right;
+            }
+            else {
+                y->parent->right = y->right;
+            }
+            y->right->parent = y->parent;
 
+        }
+        y->left = node_delete->left;
+        y->left->parent = y;
+        y->type = node_delete->type;
     }
+   delete node_delete;
 
 }
 
