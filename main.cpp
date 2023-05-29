@@ -31,9 +31,10 @@ void left_rotate(Node* &head, Node* &k);
 void right_rotate(Node* &head, Node* &k);
 void deleet(int num, Node* &head);
 void search (Node* n, int searchnum);
+void replace(Node* &head, Node* &u, Node* &v);
+
 
 int main() {
-    cout << 1/5;
     char input[80];
     int rawinputs[80];
     bool cont = true;
@@ -244,6 +245,76 @@ void print(Node* n, int numTabs) {
   print(n->left, numTabs);
 }
 
+void deleet_fix(Node* &head, Node* &x) {
+    cout << "delete_fix" << endl;
+    Node* s;
+    while(x != head && x->type == 1) {//while passed node is not head and is black
+        cout << "while" << endl;
+        if (x == x->parent->left) {//is left child
+            cout << "x is left child" << endl;
+            s = x->parent->right;//s is right sibling
+            if (s->type == 1) {
+                s->type = 2;
+                x->parent->type = 1;
+                left_rotate(head, x->parent);
+                s = x->parent->right;
+            }
+            if (s->left->type == 2 && s->right->type == 2) {
+                s->type = 1;
+                x = x->parent;
+            }
+            else{
+                if(s->right->type == 2) {
+                s->left->type = 2;
+                s->type = 1;
+                right_rotate(head, s);
+                s = x->parent->right;
+                }
+                s->type = x->parent->type;
+                x->parent->type = 2;
+                s->right->type = 2;
+                left_rotate(head, x->parent);
+                x = head;
+            }
+        }
+        else {//is right child
+            cout << "x is right child" << endl;
+            s = x->parent->left;//s is right sibling
+            cout << "e " << endl;
+            if (s->type == 1) {
+                cout << "a" << endl;
+                s->type = 2;
+                x->parent->type = 1;
+                right_rotate(head, x->parent);
+                s = x->parent->left;
+            }
+            cout << "f" << endl;
+            if (s->right->type == 2 && s->left->type == 2) {
+                cout << "b" << endl;
+                s->type = 1;
+                x = x->parent;
+            }
+            else {
+                cout << "c" << endl;
+                if(s->left->type == 2) {
+                    cout << "d" << endl;
+                    s->right->type = 2;
+                    s->type = 1;
+                    left_rotate(head, s);
+                    s = x->parent->left;
+                }
+                s->type = x->parent->type;
+                x->parent->type = 2;
+                s->left->type = 2;
+                right_rotate(head, x->parent);
+                x = head;
+            }
+            
+        }
+    }
+    x->type = 2;
+}
+
 void replace(Node* &head, Node* &u, Node* &v) {
     if (u->parent == NULL) {
 			head = v;
@@ -326,7 +397,9 @@ void deleet(int num, Node* &head) {
     cout << "end" << endl;
    delete node_delete;
    cout << "deleted" << endl;
-
+   if (color == 2) {
+    deleet_fix(head, node_replacer);
+   }
 }
 
 void search (Node* n, int searchnum) {
